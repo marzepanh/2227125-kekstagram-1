@@ -1,5 +1,5 @@
 import {createArrOfPhoto} from './data.js';
-import {viewPhotoInFullSize} from './bigrendering.js';
+import {viewPhotoInFullSize} from './big_rendering.js';
 
 const photoListElement = document.querySelector('.pictures');
 const photoTemplate = document.querySelector('#picture')

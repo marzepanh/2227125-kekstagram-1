@@ -1,5 +1,4 @@
 import {getRandomDigit,  getRandomElement, getRandomElementNotRep} from './util.js';
-const NUM_OF_COMMENTS = 3;
 const ARR_OF_ID_FOR_PHOTO = Array.from({length: 25}, (_v, k) => k+1);
 const ARR_OF_I_FOR_URL = Array.from({length: 25}, (_v, k) => k+1);
 
@@ -46,6 +45,6 @@ const createPhoto = () => ({
   url: `photos/${getRandomElementNotRep(ARR_OF_I_FOR_URL)}.jpg`,
   description: getRandomElement(DESCRIPTIONS),
   likes: getRandomDigit(15, 200),
-  comments: Array.from({length: NUM_OF_COMMENTS}, createComment)
+  comments: Array.from({length: getRandomDigit(1,10)}, createComment)
 });
 export const createArrOfPhoto = () => Array.from({length: 25}, createPhoto);

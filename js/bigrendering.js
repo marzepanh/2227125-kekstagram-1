@@ -7,6 +7,9 @@ const onPopupEscKeydown = (evt) => {
   }
 };
 
+const classBigPicture = document.querySelector('.big-picture');
+const body = document.querySelector('body');
+
 export function viewPhotoInFullSize (photo) {
   document.querySelector('.big-picture__img').querySelector('img').src = photo.url;
   document.querySelector('.likes-count').textContent = photo.likes;
@@ -14,28 +17,28 @@ export function viewPhotoInFullSize (photo) {
   document.querySelector('.social__caption').textContent = photo.description;
   document.querySelector('.social__comment-count').classList.add('hidden');
   document.querySelector('.comments-loader').classList.add('hidden');
-  document.querySelector('body').classList.add('modal-open');
-  document.querySelector('.big-picture').classList.remove('hidden');
+  body.classList.add('modal-open');
+  classBigPicture.classList.remove('hidden');
   document.querySelector('.big-picture__cancel').addEventListener('click', closeFullSizePhoto);
   document.addEventListener('keydown', onPopupEscKeydown);
   createComments(photo.comments);
 }
 
 function closeFullSizePhoto() {
-  document.querySelector('.big-picture').classList.add('hidden');
+  classBigPicture.classList.add('hidden');
+  body.classList.remove('modal-open');
   document.removeEventListener('keydown', onPopupEscKeydown);
 }
-
 
 function createComments (comments) {
   const classSocialComment = document.querySelector('.social__comment');
   let clone = classSocialComment.cloneNode(true);
   deleteComments();
-  for (let i = 0; i <= comments.length - 1; i++) {
+  for (const comment of comments) {
     const img = clone.querySelector('img');
-    img.src = comments[i].avatar;
-    img.alt = comments[i].name;
-    clone.querySelector('.social__text').textContent = comments[i].message;
+    img.src = comment.avatar;
+    img.alt = comment.name;
+    clone.querySelector('.social__text').textContent = comment.message;
     document.querySelector('.social__comments').appendChild(clone);
     clone = classSocialComment.cloneNode(true);
   }
@@ -43,7 +46,5 @@ function createComments (comments) {
 
 function deleteComments () {
   const arrOfCom = document.querySelectorAll('.social__comment');
-  for (let i = 0; i <= arrOfCom.length - 1; i++) {
-    document.querySelector('.social__comment').remove();
-  }
+  Array.from({length:  arrOfCom.length}, () => document.querySelector('.social__comment').remove());
 }
