@@ -48,5 +48,4 @@ const createPhoto = () => ({
   likes: getRandomDigit(15, 200),
   comments: Array.from({length: NUM_OF_COMMENTS}, createComment)
 });
-const createArrOfPhoto = () => Array.from({length: 25}, createPhoto);
-export {createArrOfPhoto};
+export const createArrOfPhoto = () => Array.from({length: 25}, createPhoto);

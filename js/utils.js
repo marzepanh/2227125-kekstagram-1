@@ -20,3 +20,4 @@ export function getRandomElementNotRep(array) {
 export function getRandomElement(array) {
   return array[getRandomDigit(0, array.length - 1)];
 }
+export const isEscapeKey = (evt) => evt.key === 'Escape';
