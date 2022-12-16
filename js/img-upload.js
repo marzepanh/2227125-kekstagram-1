@@ -1,4 +1,5 @@
 import {isEscapeKey} from './util.js';
+import {sendData} from './api.js';
 
 const form = document.querySelector('.img-upload__form');
 const classImgUploadOverlay = document.querySelector('.img-upload__overlay');
@@ -16,7 +17,14 @@ const effects = document.querySelector('.effects__list');
 const fieldForSlider = document.querySelector('.img-upload__effect-level');
 const effectLevelValue = document.querySelector('.effect-level__value');
 const flagsToGetInfoAboutEffect = { filterInfo: 'filterInfo', sliderInfo: 'sliderInfo'};
-let effect;
+const submitButton = form.querySelector('.img-upload__submit');
+const errSub = document.querySelector('#error').content.querySelector('.error');
+const succSub = document.querySelector('#success').content.querySelector('.success');
+const succButton = succSub.querySelector('.success__button');
+const errButton = errSub.querySelector('.error__button');
+const inpHash = form.querySelector('.text__hashtags');
+const inpComm = form.querySelector('.text__description');
+let effect, pristine;
 
 openForm();
 
@@ -45,6 +53,7 @@ function addListeners() {
   scaleSmaller.addEventListener('click', scaleChange);
   scaleBigger.addEventListener('click', scaleChange);
   effects.addEventListener('change', switchingEffect);
+  form.addEventListener('submit', submit);
 }
 
 function removeListeners() {
@@ -58,6 +67,7 @@ function removeListeners() {
   scaleBigger.removeEventListener('click', scaleChange);
   effects.removeEventListener('change', switchingEffect);
   slider.noUiSlider.destroy();
+  form.removeEventListener('submit', submit);
 }
 
 function getInfoAboutEffect (obj) {
@@ -105,27 +115,24 @@ function switchingEffect(evt) {
   editImg.classList.add(`effects__preview--${effect.split('-')[1]}`);
   if (effect === 'effect-none') {
     fieldForSlider.classList.add('hidden');
+    editImg.style.filter = '';
   } else {
     fieldForSlider.classList.remove('hidden');
+    const minMaxStep = getInfoAboutEffect(flagsToGetInfoAboutEffect.sliderInfo);
+    slider.noUiSlider.updateOptions({
+      range: {
+        min: minMaxStep[0],
+        max: minMaxStep[1]
+      },
+      start: minMaxStep[1],
+      step: minMaxStep[2]
+    });
   }
-  const minMaxStep = getInfoAboutEffect(flagsToGetInfoAboutEffect.sliderInfo);
-  slider.noUiSlider.updateOptions({
-    range: {
-      min: minMaxStep[0],
-      max: minMaxStep[1]
-    },
-    start: minMaxStep[1],
-    step: minMaxStep[2]
-  });
 }
 
 function switchingSLider () {
   effectLevelValue.value = slider.noUiSlider.get();
-  if (effect === 'effect-none') {
-    editImg.style.filter = '';
-  } else {
-    editImg.style.filter = getInfoAboutEffect(flagsToGetInfoAboutEffect.filterInfo);
-  }
+  editImg.style.filter = getInfoAboutEffect(flagsToGetInfoAboutEffect.filterInfo);
 }
 
 function scaleChange(evt) {
@@ -138,6 +145,16 @@ function scaleChange(evt) {
   editImg.style.transform = `scale(${val})`;
   scaleValue.value = `${val * 100}%`;
 }
+
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = 'Публикую...';
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = 'Опубликовать';
+};
 
 function isHashtag (hashtag) {
   const regex = /^#[A-Za-zА-Яа-яЁё0-9]{1,19}/;
@@ -152,20 +169,61 @@ function validHashtags (value) {
   return duplicates.length === 0;
 }
 
+function msgClose () {
+  if (body.contains(succSub)) {
+    body.removeChild(succSub);
+    succButton.removeEventListener('click', msgClose);
+  }
+  if (body.contains(errSub)) {
+    body.removeChild(errSub);
+    classImgUploadOverlay.classList.remove('hidden');
+    errButton.removeEventListener('click', msgClose);
+  }
+  document.removeEventListener('keydown', escMessage);
+  document.removeEventListener('click', msgClose);
+}
+
+function escMessage(evt) {
+  if (isEscapeKey(evt)) {
+    msgClose();
+  }
+}
 function workWithPristine() {
-  const pristine = new Pristine(form, {
+  pristine = new Pristine(form, {
     classTo: 'text',
     errorTextParent: 'text'
   });
   pristine.addValidator(inputForHashtags, (value) => validHashtags(value), 'Incorrect hashtags');
-  form.addEventListener('submit', (evt) => {
-    const isValid = pristine.validate();
-    if (!isValid) {
-      evt.preventDefault();
-    }
-  });
+  if (pristine.validate()) {unblockSubmitButton();}
+  else {blockSubmitButton();}
 }
 
+function submit(evt) {
+  evt.preventDefault();
+  const isValid = pristine.validate();
+  if (isValid) {
+    blockSubmitButton();
+    sendData(
+      () => {
+        unblockSubmitButton();
+        closeForm();
+        body.appendChild(succSub);
+        succButton.addEventListener('click', msgClose);
+        document.addEventListener('keydown', escMessage);
+        document.addEventListener('click', msgClose);
+      },
+      () => {
+        unblockSubmitButton();
+        classImgUploadOverlay.classList.add('hidden');
+        body.appendChild(errSub);
+        errButton.addEventListener('click', msgClose);
+        document.addEventListener('keydown', escMessage);
+        document.addEventListener('click', msgClose);
+      },
+      new FormData(evt.target),
+    );
+  }
+}
 function openForm() {
   uploadFile.addEventListener('change', () => {
     classImgUploadOverlay.classList.remove('hidden');
@@ -193,7 +251,8 @@ function openForm() {
 function closeForm() {
   classImgUploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
+  uploadFile.value = '';
+  inpComm.value = '';
+  inpHash.value = '';
   removeListeners();
-  // eslint-disable-next-line no-return-assign
-  document.querySelectorAll('input, textarea').forEach((el)=>el.value = '');
 }
