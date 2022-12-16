@@ -232,6 +232,7 @@ function openForm() {
     scaleValue.value = '100%';
     editImg.style.transform = `scale(${1})`;
     effect = 'effect-none';
+    editImg.style.filter = '';
     fieldForSlider.classList.add('hidden');
     editImg.classList.add('effects__preview--none');
     addListeners();
@@ -254,5 +255,6 @@ function closeForm() {
   uploadFile.value = '';
   inpComm.value = '';
   inpHash.value = '';
+  editImg.classList.remove(`effects__preview--${effect.split('-')[1]}`);
   removeListeners();
 }
