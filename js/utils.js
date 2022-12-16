@@ -21,3 +21,7 @@ export function getRandomElement(array) {
   return array[getRandomDigit(0, array.length - 1)];
 }
 export const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export function arrayEnded (array) {
+  return array.length === 0;
+}
