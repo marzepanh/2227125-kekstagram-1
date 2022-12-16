@@ -1,4 +1,7 @@
-import { getRandomInt, getRandom } from './utils.js';
+import {getRandomDigit,  getRandomElement, getRandomElementNotRep} from './util.js';
+const NUM_OF_COMMENTS = 3;
+const ARR_OF_ID_FOR_PHOTO = Array.from({length: 25}, (_v, k) => k+1);
+const ARR_OF_I_FOR_URL = Array.from({length: 25}, (_v, k) => k+1);
 
 const DESCRIPTIONS = [
   'My first photo here',
@@ -11,7 +14,7 @@ const DESCRIPTIONS = [
   'My favorite book',
 ];
 
-const MESSAGES = [
+const COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -31,37 +34,19 @@ const NAMES = [
   'Вашингтон',
 ];
 
-const USED_ID = [];
-const MAX_ID = 100000;
-const POSTS_AMOUNT = 25;
-
-
-function getRandomId() {
-  const id = getRandomInt(0, MAX_ID);
-  if (id in USED_ID) {
-    getRandomId();
-  }
-  USED_ID.push(id);
-  return id;
-}
-
 const createComment = () => ({
-  id: getRandomId(),
-  avatar: `img/avatar-${getRandomInt(1, 6)}.svg`,
-  message: getRandom.call(MESSAGES),
-  name: getRandom.call(NAMES),
+  id: getRandomDigit(0, 5000000),
+  avatar: `img/avatar-${getRandomDigit(1, 6)}.svg`,
+  message: getRandomElement(COMMENTS),
+  name: getRandomElement(NAMES)
 });
 
-const createPost = (id) => ({
-  id: id,
-  url: `photos/${id}.jpg`,
-  description: getRandom.call(DESCRIPTIONS),
-  likes: getRandomInt(15, 200),
-  comments: Array.from({length: getRandomInt(5, 30)}, createComment),
+const createPhoto = () => ({
+  id: getRandomElementNotRep(ARR_OF_ID_FOR_PHOTO),
+  url: `photos/${getRandomElementNotRep(ARR_OF_I_FOR_URL)}.jpg`,
+  description: getRandomElement(DESCRIPTIONS),
+  likes: getRandomDigit(15, 200),
+  comments: Array.from({length: NUM_OF_COMMENTS}, createComment)
 });
-
-const createPosts = () => Array.from({length: POSTS_AMOUNT}, (v, i) => createPost(i + 1));
-
-export { createPosts };
-
-
+const createArrOfPhoto = () => Array.from({length: 25}, createPhoto);
+export {createArrOfPhoto};
