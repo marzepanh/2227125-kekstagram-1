@@ -22,26 +22,24 @@ const errSub = document.querySelector('#error').content.querySelector('.error');
 const succSub = document.querySelector('#success').content.querySelector('.success');
 const succButton = succSub.querySelector('.success__button');
 const errButton = errSub.querySelector('.error__button');
-const inpHash = form.querySelector('.text__hashtags');
-const inpComm = form.querySelector('.text__description');
 let effect, pristine;
 
 openForm();
 
-const onPopupEscKeydown = (evt) => {
+function onPopupEscKeydown(evt) {
   if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeForm();
   }
-};
+}
 
-const inputInFocus = () => {
+function inputInFocus() {
   document.removeEventListener('keydown', onPopupEscKeydown);
-};
+}
 
-const inputInBlur = () => {
+function inputInBlur() {
   document.addEventListener('keydown', onPopupEscKeydown);
-};
+}
 
 function addListeners() {
   document.addEventListener('keydown', onPopupEscKeydown);
@@ -146,15 +144,15 @@ function scaleChange(evt) {
   scaleValue.value = `${val * 100}%`;
 }
 
-const blockSubmitButton = () => {
+function blockSubmitButton() {
   submitButton.disabled = true;
   submitButton.textContent = 'Публикую...';
-};
+}
 
-const unblockSubmitButton = () => {
+function unblockSubmitButton() {
   submitButton.disabled = false;
   submitButton.textContent = 'Опубликовать';
-};
+}
 
 function isHashtag (hashtag) {
   const regex = /^#[A-Za-zА-Яа-яЁё0-9]{1,19}/;
@@ -226,35 +224,39 @@ function submit(evt) {
 }
 function openForm() {
   uploadFile.addEventListener('change', () => {
-    classImgUploadOverlay.classList.remove('hidden');
-    body.classList.add('modal-open');
-    workWithPristine();
-    scaleValue.value = '100%';
-    editImg.style.transform = `scale(${1})`;
-    effect = 'effect-none';
-    editImg.style.filter = '';
-    fieldForSlider.classList.add('hidden');
-    editImg.classList.add('effects__preview--none');
-    addListeners();
-    noUiSlider.create(slider, {
-      range: {
-        min: 0,
-        max: 0,
-      },
-      start: 0
-    });
-    slider.noUiSlider.on('update', () => {
-      switchingSLider();
-    });
+    const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+    const fileChooser = document.querySelector('input[type=file]');
+    const file = fileChooser.files[0];
+    const fileName = file.name.toLowerCase();
+    if(FILE_TYPES.some((it) => fileName.endsWith(it))) {
+      classImgUploadOverlay.classList.remove('hidden');
+      body.classList.add('modal-open');
+      workWithPristine();
+      scaleValue.value = '100%';
+      editImg.style.transform = `scale(${1})`;
+      effect = 'effect-none';
+      editImg.style.filter = '';
+      fieldForSlider.classList.add('hidden');
+      editImg.classList.add('effects__preview--none');
+      addListeners();
+      noUiSlider.create(slider, {
+        range: {
+          min: 0,
+          max: 0,
+        },
+        start: 0
+      });
+      slider.noUiSlider.on('update', () => {
+        switchingSLider();
+      });
+    }
   });
 }
 
 function closeForm() {
   classImgUploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
-  uploadFile.value = '';
-  inpComm.value = '';
-  inpHash.value = '';
+  form.reset();
   editImg.classList.remove(`effects__preview--${effect.split('-')[1]}`);
   removeListeners();
 }

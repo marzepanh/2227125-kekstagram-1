@@ -33,18 +33,22 @@ const NAMES = [
   'Вашингтон',
 ];
 
-const createComment = () => ({
-  id: getRandomDigit(0, 5000000),
-  avatar: `img/avatar-${getRandomDigit(1, 6)}.svg`,
-  message: getRandomElement(COMMENTS),
-  name: getRandomElement(NAMES)
-});
+function createComment() {
+  return {
+    id: getRandomDigit(0, 5000000),
+    avatar: `img/avatar-${getRandomDigit(1, 6)}.svg`,
+    message: getRandomElement(COMMENTS),
+    name: getRandomElement(NAMES)
+  };
+}
 
-const createPhoto = () => ({
-  id: getRandomElementNotRep(ARR_OF_ID_FOR_PHOTO),
-  url: `photos/${getRandomElementNotRep(ARR_OF_I_FOR_URL)}.jpg`,
-  description: getRandomElement(DESCRIPTIONS),
-  likes: getRandomDigit(15, 200),
-  comments: Array.from({length: getRandomDigit(1,10)}, createComment)
-});
-export const createArrOfPhoto = () => Array.from({length: 25}, createPhoto);
+function createPhoto() {
+  return {
+    id: getRandomElementNotRep(ARR_OF_ID_FOR_PHOTO),
+    url: `photos/${getRandomElementNotRep(ARR_OF_I_FOR_URL)}.jpg`,
+    description: getRandomElement(DESCRIPTIONS),
+    likes: getRandomDigit(15, 200),
+    comments: Array.from({length: getRandomDigit(1,10)}, createComment)
+  };
+}
+export function createArrOfPhoto() {Array.from({length: 25}, createPhoto);}

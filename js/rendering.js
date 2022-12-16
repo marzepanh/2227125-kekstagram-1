@@ -35,7 +35,7 @@ function removePhotos() {
   previousPhotos = [];
 }
 
-const setFilterClick = (photos, cb) => {
+function setFilterClick(photos, cb) {
   document.querySelector('.img-filters__form').addEventListener('click', (evt) => {
     newPhotos = photos.slice();
     switch (evt.target.id) {
@@ -59,7 +59,7 @@ const setFilterClick = (photos, cb) => {
     }
     cb();
   });
-};
+}
 
 export function renderPhotos (photos) {
   document.querySelector('.img-filters').classList.remove('img-filters--inactive');

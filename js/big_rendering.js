@@ -1,29 +1,43 @@
 import {isEscapeKey, arrayEnded} from './util.js';
 
-const onPopupEscKeydown = (evt) => {
-  if (isEscapeKey(evt)) {
-    evt.preventDefault();
-    closeFullSizePhoto();
-  }
-};
-
 const classBigPicture = document.querySelector('.big-picture');
 const body = document.querySelector('body');
 const classSocialComment = document.querySelector('.social__comment');
 const classCommentsLoader = document.querySelector('.comments-loader');
 const classSocialCommentCount = document.querySelector('.social__comment-count');
-let loadedCommentsCounter = 0;
-let numOfComments = 0;
-let commentsClone;
+const bigImg = document.querySelector('.big-picture__img').querySelector('img');
+const likes = document.querySelector('.likes-count');
+const description = document.querySelector('.social__caption');
+const cancel = document.querySelector('.big-picture__cancel');
+let loadedCommentsCounter, numOfComments = 0;
+let commentsClone, clone;
+
+function onPopupEscKeydown(evt) {
+  if (isEscapeKey(evt)) {
+    evt.preventDefault();
+    closeFullSizePhoto();
+  }
+}
+
+function addEventListeners() {
+  cancel.addEventListener('click', closeFullSizePhoto);
+  document.addEventListener('keydown', onPopupEscKeydown);
+  classCommentsLoader.addEventListener('click', creatingComments);
+}
+
+function removeEventListeners() {
+  document.removeEventListener('keydown', onPopupEscKeydown);
+  cancel.removeEventListener('click', closeFullSizePhoto);
+  classCommentsLoader.removeEventListener('click', creatingComments);
+}
 
 export function viewPhotoInFullSize (photo) {
-  document.querySelector('.big-picture__img').querySelector('img').src = photo.url;
-  document.querySelector('.likes-count').textContent = photo.likes;
-  document.querySelector('.social__caption').textContent = photo.description;
+  bigImg.src = photo.url;
+  likes.textContent = photo.likes;
+  description.textContent = photo.description;
   body.classList.add('modal-open');
   classBigPicture.classList.remove('hidden');
-  document.querySelector('.big-picture__cancel').addEventListener('click', closeFullSizePhoto);
-  document.addEventListener('keydown', onPopupEscKeydown);
+  addEventListeners();
   classCommentsLoader.classList.remove('hidden');
   createComments(photo.comments);
 }
@@ -31,10 +45,10 @@ export function viewPhotoInFullSize (photo) {
 function closeFullSizePhoto() {
   classBigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
-  document.removeEventListener('keydown', onPopupEscKeydown);
+  removeEventListeners();
 }
 
-function creatingComments(clone) {
+function creatingComments() {
   let counter = 0;
   while (counter !== 5) {
     if (arrayEnded(commentsClone)) {break;}
@@ -56,12 +70,9 @@ function createComments (comments) {
   numOfComments = comments.length;
   loadedCommentsCounter = 0;
   commentsClone = comments.slice(0);
-  const clone = classSocialComment.cloneNode(true);
+  clone = classSocialComment.cloneNode(true);
   deleteComments();
-  creatingComments(clone);
-  classCommentsLoader.addEventListener('click', () => {
-    creatingComments(clone);
-  });
+  creatingComments();
 }
 
 function deleteComments () {
